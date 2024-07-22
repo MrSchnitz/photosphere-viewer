@@ -5,13 +5,14 @@ import {
   SRGBColorSpace,
   Texture,
   TextureLoader,
+  Vector3,
 } from "three";
 import { Environment } from "@react-three/drei";
 import { useEffect, useState } from "react";
-import {Files} from "./App.tsx";
+import { Files, FilesType, FileType } from "./App.tsx";
 
 type Props = {
-  file: string;
+  file: FileType;
   deltaY: number;
 };
 
@@ -22,7 +23,7 @@ const PhotosphereView = ({ file, deltaY }: Props) => {
   const [isWheel, setIsWheel] = useState(false);
   // const [texture, setTexture] = useState<Texture | null>(null);
 
-  const texture = useLoader(TextureLoader, file, undefined, (progress) => {
+  const texture = useLoader(TextureLoader, file.blob, undefined, (progress) => {
     console.log("progress", progress);
   });
   texture.colorSpace = SRGBColorSpace;
@@ -35,28 +36,32 @@ const PhotosphereView = ({ file, deltaY }: Props) => {
   //   setMouse({ x: state.pointer.x, y: state.pointer.y });
   // });
 
-  // useEffect(() => {
-  //   window.addEventListener("mousemove", (event) => {
-  //     setMouse({ x: event.clientX, y: event.clientY });
-  //   });
-  //
-  //   return () => {
-  //     window.removeEventListener("mousemove", (event) => {
-  //       setMouse({ x: event.clientX, y: event.clientY });
-  //     });
-  //   };
-  // }, []);
-
   useEffect(() => {
-    const zoom = camera.zoom + deltaY * -0.03;
-    camera.zoom = MathUtils.clamp(zoom, 1, 9);
+    window.addEventListener("mousemove", (event) => {
+      setMouse({ x: event.clientX, y: event.clientY });
+    });
 
-   // setIsWheel(true);
+    return () => {
+      window.removeEventListener("mousemove", (event) => {
+        setMouse({ x: event.clientX, y: event.clientY });
+      });
+    };
+  }, []);
 
-    // console.log("camera", mouse.x, mouse.y);
-
-    camera.updateProjectionMatrix();
-  }, [camera, deltaY]);
+  // useEffect(() => {
+  //   const zoom = camera.zoom + deltaY * -0.03;
+  //   camera.zoom = MathUtils.clamp(zoom, 1, 9);
+  //
+  //   console.log("LLL", mouse)
+  //
+  //   camera.lookAt(new Vector3(mouse.x, mouse.y, 0));
+  //
+  //   // setIsWheel(true);
+  //
+  //   // console.log("camera", mouse.x, mouse.y);
+  //
+  //   camera.updateProjectionMatrix();
+  // }, [camera, deltaY, mouse.x, mouse.y]);
 
   // useEffect(() => {
   //   console.log("FFFF", files);

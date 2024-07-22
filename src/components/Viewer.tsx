@@ -1,9 +1,8 @@
 import { OrbitControls } from "@react-three/drei";
 import PhotosphereView from "../PhotosphereView.tsx";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
 import React, { useRef, useState } from "react";
-import { MathUtils } from "three";
-import { Files, FilesType } from "../App.tsx";
+import { Files, FilesType, FileType } from "../App.tsx";
 import ModelViewer from "../ModelViewer.tsx";
 
 type Props = {
@@ -14,11 +13,9 @@ const Viewer = ({ files }: Props) => {
   const [autoRotate, setAutoRotate] = useState(true);
   const [deltaY, setDeltaY] = useState(0);
   const timeout = useRef<number | null>(null);
-  const [selectedImage, setSelectedImage] = useState<string | null>(
+  const [selectedImage, setSelectedImage] = useState<FileType | null>(
     files.files.length === 1 ? files.files[0] : null,
   );
-
-  console.log("FFFF", files)
 
   const handleMouseDown = () => {
     setAutoRotate(false);
@@ -45,9 +42,9 @@ const Viewer = ({ files }: Props) => {
         <img
           width={300}
           height={300}
-          src={file}
-          alt={file}
-          key={file}
+          src={file.blob}
+          alt={file.file.name}
+          key={file.file.name}
           onClick={() => setSelectedImage(file)}
           className="rounded-lg transition-all cursor-pointer border border-transparent hover:border-white"
         />
@@ -77,8 +74,10 @@ const Viewer = ({ files }: Props) => {
               makeDefault
               autoRotate={autoRotate}
               autoRotateSpeed={0.5}
-              enableZoom
               enablePan={false}
+              enableZoom
+              zoomToCursor
+
             />
             {files.type === FilesType.Model ? (
               <ModelViewer file={selectedImage} />

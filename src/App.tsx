@@ -3,6 +3,7 @@ import { KeyboardControls, KeyboardControlsEntry } from "@react-three/drei";
 import { useMemo, useState } from "react";
 import LandingBanner from "./components/LandingBanner.tsx";
 import Viewer from "./components/Viewer.tsx";
+import NavBar, { Page } from "./components/Navbar/NavBar.tsx";
 
 // const presetPhotosphere = {
 //   bankok: "./preset/bankok.jpg",
@@ -14,12 +15,17 @@ export enum FilesType {
   Model = "model",
 }
 
+export type FileType = {
+  blob: string;
+  file: File;
+}
+
 export type Files = {
-  files: string[];
+  files: FileType[];
   type: FilesType;
 };
 
-enum Controls {
+export enum Controls {
   forward = "forward",
   back = "back",
   left = "left",
@@ -29,6 +35,7 @@ enum Controls {
 
 function App() {
   const [files, setFiles] = useState<Files | null>(null);
+  const [page, setPage] = useState<Page | null>(null);
 
   const map = useMemo<KeyboardControlsEntry<Controls>[]>(
     () => [
@@ -41,14 +48,20 @@ function App() {
     [],
   );
 
+  const handleSetFile = (files: Files | null) => {
+    setPage(Page.VIEW);
+    setFiles(files);
+  };
+
   return (
     <KeyboardControls map={map}>
-      {!files && (
+      {page && <NavBar page={page} onNavChange={setPage} />}
+      {page !== Page.VIEW && (
         <div className="h-full w-full grid place-content-center">
-          <LandingBanner onFiles={setFiles} />
+          <LandingBanner onFiles={handleSetFile} />
         </div>
       )}
-      {files && <Viewer files={files} />}
+      {page === Page.VIEW && files && <Viewer files={files} />}
     </KeyboardControls>
   );
 }

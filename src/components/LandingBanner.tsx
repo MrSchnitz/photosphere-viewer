@@ -1,6 +1,7 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import clsx from "clsx";
-import { Files, FilesType } from "../App.tsx";
+import { Controls, Files, FilesType } from "../App.tsx";
+import { useKeyboardControls } from "@react-three/drei";
 
 type Props = {
   onFiles: (files: Files) => void;
@@ -8,6 +9,12 @@ type Props = {
 
 const LandingBanner = ({ onFiles }: Props) => {
   const [dragover, setDragover] = useState(false);
+
+  const pressed = useKeyboardControls<Controls>((state) => state.forward);
+
+  useEffect(() => {
+    console.log("HMMM", pressed);
+  }, [pressed]);
 
   const handleCreateObjectFile = (files: FileList) => {
     const imageFiles = /(\.jpg|\.jpeg|\.png|\.gif|\.hdr)$/i;
@@ -24,7 +31,10 @@ const LandingBanner = ({ onFiles }: Props) => {
         isModel = true;
       }
 
-      return URL.createObjectURL(file);
+      return {
+        blob: URL.createObjectURL(file),
+        file,
+      };
     });
     // console.log("FFFF", fileObjects);
 
